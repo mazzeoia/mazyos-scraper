@@ -12,7 +12,19 @@ No meu primeiro teste, "dentista" no Batel, em Curitiba, voltaram 31 clínicas e
 
 ---
 
-## Como instalar (Windows)
+## Como instalar
+
+### Pelo Claude Code (o jeito mais fácil)
+
+Abra o Claude Code numa pasta qualquer e cole isto:
+
+```
+Clona o repositório https://github.com/mazzeoia/mazyos-scraper, entra na pasta e segue o CLAUDE.md pra instalar e abrir o MazyOS Scraper.
+```
+
+Ele baixa o código, instala o que faltar e abre a ferramenta no navegador. Funciona no Windows, no Mac e no Linux. Quando ele pedir permissão pra rodar o script de instalação, pode aprovar.
+
+### Na mão (Windows)
 
 1. Na lateral desta página, clique em **Releases** e baixe o arquivo `mazyos-scraper-windows.zip`.
 2. Extraia o zip numa pasta qualquer (Documentos, por exemplo).
@@ -24,7 +36,7 @@ O Windows pode mostrar o aviso "O Windows protegeu o computador". Isso acontece 
 
 Pra desligar, feche a janela "MazyOS Scraper" que fica minimizada na barra de tarefas.
 
-Mac e Linux: por enquanto, só compilando a partir do código (instruções no fim da página).
+Mac e Linux: use o caminho do Claude Code, ou rode `bash instalar.sh` e depois `bash abrir.sh` na pasta do projeto.
 
 ---
 
