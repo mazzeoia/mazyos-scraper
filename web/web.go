@@ -129,6 +129,23 @@ func New(svc *Service, addr string) (*Server, error) {
 		ans.download(w, r)
 	})
 
+	mux.HandleFunc("/api/v1/jobs/{id}/places", func(w http.ResponseWriter, r *http.Request) {
+		r = requestWithID(r)
+
+		if r.Method != http.MethodGet {
+			ans := apiError{
+				Code:    http.StatusMethodNotAllowed,
+				Message: methodNotAllowedMessage,
+			}
+
+			renderJSON(w, http.StatusMethodNotAllowed, ans)
+
+			return
+		}
+
+		ans.apiGetPlaces(w, r)
+	})
+
 	handler := securityHeaders(mux)
 	ans.srv.Handler = handler
 
@@ -661,6 +678,28 @@ func (s *Server) viewJob(w http.ResponseWriter, r *http.Request) {
 	_, _ = buf.WriteTo(w)
 }
 
+// apiGetPlaces returns the job's places as JSON. While a job is still running
+// its CSV is being written, so a partial read returns an empty list instead of
+// an error and the client simply polls again.
+func (s *Server) apiGetPlaces(w http.ResponseWriter, r *http.Request) {
+	id, ok := getIDFromRequest(r)
+	if !ok {
+		renderJSON(w, http.StatusUnprocessableEntity, apiError{
+			Code:    http.StatusUnprocessableEntity,
+			Message: "Invalid ID",
+		})
+
+		return
+	}
+
+	places, err := s.svc.GetPlaces(r.Context(), id.String())
+	if err != nil {
+		places = []Place{}
+	}
+
+	renderJSON(w, http.StatusOK, places)
+}
+
 func (s *Server) apiDeleteJob(w http.ResponseWriter, r *http.Request) {
 	id, ok := getIDFromRequest(r)
 	if !ok {
@@ -710,9 +749,9 @@ func securityHeaders(next http.Handler) http.Handler {
 				"script-src 'self' cdn.redoc.ly cdnjs.cloudflare.com 'unsafe-inline' 'unsafe-eval'; "+
 				"worker-src 'self' blob:; "+
 				"style-src 'self' 'unsafe-inline' fonts.googleapis.com cdnjs.cloudflare.com; "+
-				"img-src 'self' data: cdn.redoc.ly cdnjs.cloudflare.com *.tile.openstreetmap.org; "+
+				"img-src 'self' data: cdn.redoc.ly cdnjs.cloudflare.com *.tile.openstreetmap.org *.basemaps.cartocdn.com; "+
 				"font-src 'self' fonts.gstatic.com; "+
-				"connect-src 'self'")
+				"connect-src 'self' nominatim.openstreetmap.org")
 
 		next.ServeHTTP(w, r)
 	})
